@@ -62,51 +62,6 @@ int main(int argc, char *argv[])
     #ifdef DEBUG
       printf("STACK : %p\nHEAP : %p\nDATA : %p\nTEXT : %p\n", pMem.pStackBase, pMem.pHeapBase, pMem.pDataBase, pMem.pTextBase);
     #endif
-    if(!parseAsm(&pVm)){
-      fprintf(stderr, "Parse Error!\n");
-      exit(EXIT_FAILURE);
-    }
-
-    if(!organizeSection(&pVm)){
-      fprintf(stderr, "Section Error!\n");
-      exit(EXIT_FAILURE);
-    }
-
-    #ifdef DEBUG
-    printf("[DATA]\n");
-    for(int32_t i = 0; pVm.varSet[i]; i++)
-      printf("word * %s = 0x%llx\n", pVm.varSet[i]->varName, pVm.varSet[i]->address);
-
-    printf("[TEXT]\n");
-    debugPrint(&pVm);
-    #endif
-
-    if(!inlinee(&pVm)){
-      fprintf(stderr, "inlinee Error!\n");
-      exit(EXIT_FAILURE);
-    }
-    debugPrint(&pVm);
-
-    if(!GlobOpt(&pVm)){
-      fprintf(stderr, "GlobOpt Error!\n");
-      exit(EXIT_FAILURE);
-    }
-    debugPrint(&pVm);
-
-    if(!Lowerer(&pVm)){
-      fprintf(stderr, "Lowerer Error!\n");
-      exit(EXIT_FAILURE);
-    }
-    debugPrint(&pVm);
-
-    char * binaryDat = codeGen(&pVm);
-    if(binaryDat == NULL){
-      fprintf(stderr, "Code Generate Error!\n");
-      exit(EXIT_FAILURE);
-    }
-
-    fwrite(binaryDat, strlen(binaryDat), 1, fOutput);
-    fwrite("\n", 1, 1, fOutput);
     fclose(fInput);
     fclose(fOutput);
     exit(EXIT_SUCCESS);
